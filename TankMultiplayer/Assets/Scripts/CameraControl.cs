@@ -3,15 +3,15 @@
 public class CameraControl : MonoBehaviour
 {
     public float m_DampTime = 0.2f;                 
-    public float m_ScreenEdgeBuffer = 4f;           
+    public float m_ScreenEdgeBuffer = 0f;           
     public float m_MinSize = 6.5f;                  
-    [HideInInspector] public Transform[] m_Targets; 
+   /* [HideInInspector]*/ public Transform[] m_Targets; 
 
 
     private Camera m_Camera;                        
     private float m_ZoomSpeed;                      
     private Vector3 m_MoveVelocity;                 
-    private Vector3 m_DesiredPosition;              
+    private Vector3 m_DesiredPosition;//攝影機應到位置           
 
 
     private void Awake()
@@ -80,7 +80,7 @@ public class CameraControl : MonoBehaviour
 
             Vector3 desiredPosToTarget = targetLocalPos - desiredLocalPos;
 
-            size = Mathf.Max (size, Mathf.Abs (desiredPosToTarget.y));
+            size = Mathf.Max (size, Mathf.Abs (desiredPosToTarget.y));// Mathf.Max 會比較2個數字並回傳最大的那個
 
             size = Mathf.Max (size, Mathf.Abs (desiredPosToTarget.x) / m_Camera.aspect);
         }
