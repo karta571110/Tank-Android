@@ -10,6 +10,7 @@ public class TankMovement : Photon.MonoBehaviour
     public AudioClip m_EngineDriving;
     public float m_PitchRange = 0.2f;
 
+    GameObject TankExplosion;
 
     private string m_MovementAxisName;
     private string m_TurnAxisName;
@@ -21,11 +22,14 @@ public class TankMovement : Photon.MonoBehaviour
 
     private void Awake()
     {
+
+
         m_Rigidbody = GetComponent<Rigidbody>();
         m_MovementAudio = GetComponent<AudioSource>();
 
         m_EngineIdling = Resources.Load<AudioClip>("AudioClips/EngineIdle");
         m_EngineDriving= Resources.Load<AudioClip>("AudioClips/EngineDriving");
+        
 
         m_MovementAudio.clip = m_EngineIdling;
     }
