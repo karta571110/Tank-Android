@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class TankHealth : MonoBehaviour
 {
@@ -103,11 +104,20 @@ public class TankHealth : MonoBehaviour
 
         m_ExplosionParticles.gameObject.SetActive(true);
 
+        m_ExplosionParticles.gameObject.transform.SetParent(null);
+
         m_ExplosionParticles.Play();
 
         m_ExplosionAudio.PlayOneShot(m_TankExplosionClip);
 
 
         gameObject.SetActive(false);
+    }
+
+    IEnumerator Particle()
+    {
+
+        yield return new WaitForSeconds(2f);
+        m_ExplosionParticles.gameObject.transform.SetParent(gameObject.transform);
     }
 }

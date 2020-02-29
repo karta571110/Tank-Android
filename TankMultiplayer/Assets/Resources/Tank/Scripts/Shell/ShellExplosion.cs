@@ -1,31 +1,98 @@
 ﻿using UnityEngine;
-
+using System.Collections;
 public class ShellExplosion : MonoBehaviour
 {
     public LayerMask m_TankMask;
-    public ParticleSystem m_ExplosionParticles;       
-    public AudioSource m_ExplosionAudio;              
-    public float m_MaxDamage = 100f;                  
-    public float m_ExplosionForce = 1000f;            
-    public float m_MaxLifeTime = 2f;                  
-    public float m_ExplosionRadius = 5f;              
+    public ParticleSystem m_ExplosionParticles;
+    public AudioSource m_ExplosionAudio;
+    public AudioClip m_ExplosionAudioClip;
+    public float m_MaxDamage = 100f;
+    public float m_ExplosionForce = 1000f;
+    public float m_MaxLifeTime = 2f;
+    public float m_ExplosionRadius = 5f;
 
-
+  public  GameObject shellTemp;
+    private void Awake()
+    {
+        
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            switch (transform.GetChild(i).name)
+            {
+                case "ShellExplosion":
+                    m_ExplosionParticles = transform.GetChild(i).GetComponent<ParticleSystem>();
+                    break;
+            }
+        }
+        shellTemp = transform.parent.gameObject;
+        m_ExplosionAudio = GetComponentInChildren<AudioSource>();
+        m_ExplosionAudioClip= Resources.Load<AudioClip>("AudioClips/ShellExplosion");
+    }
+    private void OnEnable()
+    {
+        gameObject.SetActive(true);
+    }
     private void Start()
     {
-        Destroy(gameObject, m_MaxLifeTime);
+       
     }
 
 
     private void OnTriggerEnter(Collider other)
     {
         // Find all the tanks in an area around the shell and damage them.
+
+        Collider[] colliders = Physics.OverlapSphere(transform.position, m_ExplosionRadius, m_TankMask);
+
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            Rigidbody targetRigibody = colliders[i].GetComponent<Rigidbody>();//抓取爆炸半徑內的Rigidbody
+
+            if (!targetRigibody)
+                continue;
+
+            targetRigibody.AddExplosionForce(m_ExplosionForce, transform.position, m_ExplosionRadius);
+
+            TankHealth targetHealth = targetRigibody.GetComponent<TankHealth>();
+
+            if (!targetHealth)
+                continue;
+
+            float damage = CalculateDamage(targetRigibody.position);
+
+            targetHealth.TakeDamage(damage);
+        }
+
+        StartCoroutine(Explsion());
+        
     }
 
 
     private float CalculateDamage(Vector3 targetPosition)
     {
         // Calculate the amount of damage a target should take based on it's position.
-        return 0f;
+        Vector3 explosionToTarget = targetPosition - transform.position;//求單一座標點或兩座標點之間的距離長度
+
+        float explosionDistance = explosionToTarget.magnitude;
+
+        float relativeDistance = (m_ExplosionRadius - explosionDistance) / m_ExplosionRadius;
+
+        float damage = relativeDistance * m_MaxDamage;
+
+        damage = Mathf.Max(0f, damage);
+
+        return damage;
+    }
+
+    IEnumerator Explsion()
+    {
+        transform.SetParent(null);
+        m_ExplosionParticles.Play();
+        m_ExplosionAudio.PlayOneShot(m_ExplosionAudioClip);
+
+        yield return new WaitForSeconds(m_MaxLifeTime);
+
+        gameObject.SetActive(false);
+        transform.SetParent(shellTemp.transform);
     }
 }

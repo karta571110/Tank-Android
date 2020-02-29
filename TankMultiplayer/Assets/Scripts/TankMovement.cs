@@ -118,18 +118,9 @@ public class TankMovement : Photon.MonoBehaviour
     {
         // Adjust the rotation of the tank based on the player's input.
         float turn = m_TurnInputValue * m_TurnSpeed * Time.deltaTime;
-     
-            if (m_MovementInputValue > 0)
-            {
+                
                 Quaternion turnRotation = Quaternion.Euler(0f, turn, 0);
                 m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation);
-            }
-            else
-            {
-                Quaternion turnRotation = Quaternion.Euler(0f, -turn, 0);
-                m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation);
-            }
-        
-       
+                
     }
 }
