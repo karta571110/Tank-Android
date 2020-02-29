@@ -11,10 +11,13 @@ public class ShellExplosion : MonoBehaviour
     public float m_MaxLifeTime = 2f;
     public float m_ExplosionRadius = 5f;
 
-  public  GameObject shellTemp;
+    MeshRenderer m_meshRenderer;
+    CapsuleCollider m_capsuleCollider;
+    Light m_light;
+
+    public GameObject shellTemp;
     private void Awake()
     {
-        
         for (int i = 0; i < transform.childCount; i++)
         {
             switch (transform.GetChild(i).name)
@@ -24,17 +27,23 @@ public class ShellExplosion : MonoBehaviour
                     break;
             }
         }
+        m_light = GetComponentInChildren<Light>();
+        m_meshRenderer = GetComponent<MeshRenderer>();
+        m_capsuleCollider = GetComponent<CapsuleCollider>();
         shellTemp = transform.parent.gameObject;
         m_ExplosionAudio = GetComponentInChildren<AudioSource>();
-        m_ExplosionAudioClip= Resources.Load<AudioClip>("AudioClips/ShellExplosion");
+        m_ExplosionAudioClip = Resources.Load<AudioClip>("AudioClips/ShellExplosion");
     }
     private void OnEnable()
     {
         gameObject.SetActive(true);
+        m_light.enabled = true;
+        m_meshRenderer.enabled = true;
+        m_capsuleCollider.enabled = true;
     }
     private void Start()
     {
-       
+
     }
 
 
@@ -64,7 +73,7 @@ public class ShellExplosion : MonoBehaviour
         }
 
         StartCoroutine(Explsion());
-        
+
     }
 
 
@@ -86,6 +95,9 @@ public class ShellExplosion : MonoBehaviour
 
     IEnumerator Explsion()
     {
+        m_meshRenderer.enabled = false;
+        m_capsuleCollider.enabled = false;
+        m_light.enabled = false;
         transform.SetParent(null);
         m_ExplosionParticles.Play();
         m_ExplosionAudio.PlayOneShot(m_ExplosionAudioClip);
