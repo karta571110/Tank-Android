@@ -19,6 +19,25 @@ public class TankManager
 
     public void Setup()
     {
+        switch (m_PlayerNumber)
+        {
+            case 1:
+                m_PlayerColor = new Color(72f, 123f, 207f);
+                m_SpawnPoint = GameObject.Find("SpawnPoint" + m_PlayerNumber).transform;
+                break;
+            case 2:
+                m_PlayerColor = new Color(203f, 31f, 31f);
+                m_SpawnPoint = GameObject.Find("SpawnPoint" + m_PlayerNumber).transform;
+                break;
+            case 3:
+                m_PlayerColor = new Color(197f, 96f, 181f);
+                m_SpawnPoint = GameObject.Find("SpawnPoint" + m_PlayerNumber).transform;
+                break;
+            case 4:
+                m_PlayerColor = new Color(36f, 183f, 37f);
+                m_SpawnPoint = GameObject.Find("SpawnPoint" + m_PlayerNumber).transform;
+                break;
+        }
         m_Movement = m_Instance.GetComponent<TankMovement>();
         m_Shooting = m_Instance.GetComponent<TankShooting>();
         m_CanvasGameObject = m_Instance.GetComponentInChildren<Canvas>().gameObject;
