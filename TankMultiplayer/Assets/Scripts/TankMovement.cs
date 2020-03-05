@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class TankMovement : Photon.MonoBehaviour
+public class TankMovement : MonoBehaviour
 {
     public int m_PlayerNumber = 1;
     public float m_Speed = 12f;

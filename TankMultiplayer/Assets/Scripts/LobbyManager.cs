@@ -1,0 +1,372 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using Photon.Pun;
+using Photon.Realtime;
+using UnityEngine;
+using UnityEngine.UI;
+using Com.WangMingHsi.MyTankGame;
+
+public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
+{
+    [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created")]
+    [SerializeField]
+    private byte maxPlayersPerRoom = 4;
+    #region Private Serializable Fields
+
+
+    #endregion
+
+
+    #region Private Fields
+
+
+    /// <summary>
+    /// This client's version number. Users are separated from each other by gameVersion (which allows you to make breaking changes).
+    /// </summary>
+    string gameVersion = "1";
+
+
+    #endregion
+    int i, j, k, l;//用於迭代
+
+    Dictionary<string, RoomInfo> myRoomList = new Dictionary<string, RoomInfo>();//房間清單
+
+    const string playerNamePrefKey = "PlayerName";
+
+    Button ConnectBtn;
+    Button CreatRoomBtn;
+    Button CreatRoomSettingFinishBtn;
+
+
+    InputField NameInputField;//玩家名稱
+    InputField CreateRoomNameInputField;//創建的房間名
+    InputField maxPlayerNumInputField;//房間最大人數
+
+    Text Connecttxt;
+    Text messageText;
+
+    GameObject ConnectPanel;
+    GameObject CreatRoomPanel;
+    GameObject roomInLobbyPanel;
+    GameObject RoomNameBtn;
+
+    public Transform gridLayout;
+    bool isConectting = false;
+
+    private void Awake()
+    {
+        
+        PhotonNetwork.AutomaticallySyncScene = true;
+        for (i = 0; i < transform.childCount; i++)
+        {
+            switch (transform.GetChild(i).name)
+            {
+                case "Canvas":
+                    for (j = 0; j < transform.GetChild(i).transform.childCount; j++)
+                    {
+                        switch (transform.GetChild(i).transform.GetChild(j).name)
+                        {
+                            case "RoomListPanel":
+                                roomInLobbyPanel = transform.GetChild(i).transform.GetChild(j).gameObject;
+                                for (k = 0; k < roomInLobbyPanel.transform.childCount; k++)
+                                {
+                                    switch (roomInLobbyPanel.transform.GetChild(k).name)
+                                    {
+                                        case "MessageText":
+                                            messageText = roomInLobbyPanel.transform.GetChild(k).GetComponent<Text>();
+                                            break;
+                                    }
+                                }
+                                break;
+                            case "Connecting":
+                                ConnectPanel = transform.GetChild(i).transform.GetChild(j).gameObject;
+                                for (l = 0; l < ConnectPanel.transform.childCount; l++)
+                                {
+                                    switch (ConnectPanel.transform.GetChild(l).name)
+                                    {
+                                        case "ConnectBtn":
+                                            ConnectBtn = ConnectPanel.transform.GetChild(l).GetComponent<Button>();
+                                            ConnectBtn.onClick.AddListener(delegate { Connect(ConnectPanel, Connecttxt); });
+                                            break;
+                                        case "PlayerNameInputField":
+                                            NameInputField = ConnectPanel.transform.GetChild(l).GetComponent<InputField>();
+                                            for (k = 0; k < NameInputField.transform.childCount; k++)
+                                            {
+                                                switch (NameInputField.transform.GetChild(k).name)
+                                                {
+                                                    case "Text":
+                                                        NameInputField.onEndEdit.AddListener(SetPlayerName);
+                                                        break;
+                                                }
+                                            }
+                                            break;
+                                    }
+                                }
+                                break;
+                            case "CreatRoomBtn":
+                                CreatRoomBtn = transform.GetChild(i).transform.GetChild(j).GetComponent<Button>();
+                                CreatRoomBtn.onClick.AddListener(CreatRoomPanelOn);
+                                break;
+
+                            case "ConnectText":
+                                Connecttxt = transform.GetChild(i).transform.GetChild(j).GetComponent<Text>();
+                                break;
+                            case "CreatRoomPanel":
+                                CreatRoomPanel = transform.GetChild(i).transform.GetChild(j).gameObject;
+                                for (k = 0; k < CreatRoomPanel.transform.childCount; k++)
+                                {
+                                    switch (CreatRoomPanel.transform.GetChild(k).name)
+                                    {
+                                        case "RoomNameInputField":
+                                            CreateRoomNameInputField = CreatRoomPanel.transform.GetChild(k).GetComponent<InputField>();
+                                            break;
+                                        case "PlayerNumInputField":
+                                            maxPlayerNumInputField= CreatRoomPanel.transform.GetChild(k).GetComponent<InputField>();
+                                            break;
+                                        case "SettingFinishBtn":
+                                            CreatRoomSettingFinishBtn = CreatRoomPanel.transform.GetChild(k).GetComponent<Button>();
+                                            CreatRoomSettingFinishBtn.onClick.AddListener(CreateRoom);
+                                            break;
+                                    }
+                                }
+                                break;
+                        }
+
+                    }
+                    break;
+            }
+        }//找物件
+    }
+    // Start is called before the first frame update
+    void Start()
+    {
+  
+        PhotonNetwork.ConnectUsingSettings();
+        PhotonNetwork.GameVersion = gameVersion;
+
+        string defaultName = string.Empty;
+        if (NameInputField != null)
+        {
+            if (PlayerPrefs.HasKey(playerNamePrefKey))
+            {
+                defaultName = PlayerPrefs.GetString(playerNamePrefKey);
+                NameInputField.text = defaultName;
+            }
+        }
+
+
+        PhotonNetwork.NickName = defaultName;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (PhotonNetwork.IsConnected)
+        {
+            isConectting = true;
+            Connecttxt.enabled = false;
+        }
+        else
+            isConectting = false;
+            
+        
+    }
+
+    public void SetPlayerName(string value)
+    {
+        // #Important
+        if (string.IsNullOrEmpty(value))
+        {
+            Debug.LogError("Player Name is null or empty");
+            return;
+        }
+        PhotonNetwork.NickName = value;
+
+        PlayerPrefs.SetString(playerNamePrefKey, value);
+    }
+
+
+    #region MonoBehaviourPunCallbacks Callbacks
+    /// <summary>
+    /// 連接
+    /// </summary>
+    /// <param name="Panel"></param>
+    /// <param name="txt"></param>
+    public void Connect(GameObject Panel, Text txt)
+    {
+        
+        // we check if we are connected or not, we join if we are , else we initiate the connection to the server.
+        if (PhotonNetwork.IsConnected)
+        {
+            // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
+            // PhotonNetwork.JoinRandomRoom();
+            Debug.Log("你已經連接成功，暱稱已設定完成!");
+
+            roomInLobbyPanel.SetActive(true);
+            Panel.SetActive(false);
+            CreatRoomBtn.gameObject.SetActive(true);
+
+        }
+        else
+        {
+            //連到Master #Critical, we must first and foremost connect to Photon Online Server.
+
+            PhotonNetwork.ConnectUsingSettings();
+            PhotonNetwork.GameVersion = gameVersion;
+
+        }
+    }
+
+    public void CreatRoomPanelOn()
+    {
+        CreatRoomPanel.SetActive(true);
+    }
+    /// <summary>
+    /// 開房
+    /// </summary>
+    /// <param name="maxPlayers"></param>
+    public void CreateRoom()
+    {
+        if (CreateRoomNameInputField.text != null && maxPlayerNumInputField.text != null)
+        {
+            byte maxPlayers;
+            switch (maxPlayerNumInputField.text)
+            {
+                case "1":
+                    maxPlayers = 1;
+                    break;
+                case "2":
+                    maxPlayers = 2;
+                    break;
+                case "3":
+                    maxPlayers = 3;
+                    break;
+                case "4":
+                    maxPlayers = 4;
+                    break;
+                default:
+                    Debug.Log("無效的數字");
+                    return;
+                    
+            }
+            Debug.Log("房間創建成功");
+            PhotonNetwork.CreateRoom(CreateRoomNameInputField.text, new RoomOptions() { MaxPlayers = maxPlayers });
+            PhotonNetwork.LoadLevel("Room for 1");
+        }
+    }
+    public override void OnConnectedToMaster()
+    {
+        if (isConectting)
+        {
+            PhotonNetwork.JoinLobby();//加入大廳
+            
+            Debug.Log("已加入大廳\nPUN Basics Tutorial/Launcher: OnConnectedToMaster() was called by PUN");
+        }
+    }
+
+
+
+
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+        Debug.Log("PUN Basics Tutorial/Launcher:OnJoinRandomFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom");
+
+        // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
+        // PhotonNetwork.CreateRoom(null, new RoomOptions());
+        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayersPerRoom });
+    }
+
+    public override void OnJoinedRoom()
+    {
+        /*
+        if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
+        {
+            Debug.Log("我们進到Room For 1 !!");
+
+            PhotonNetwork.LoadLevel("Room for 1");
+        }
+        */
+        Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        ConnectPanel.SetActive(true);
+        Connecttxt.enabled = false;
+        Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
+    }
+    #endregion
+    
+    /// <summary>
+    /// 查看房間清單
+    /// </summary>
+    /// <param name="roomList"></param>
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        Debug.Log("roomListUpdated");
+
+        //pr用来暂时保存ui上的房间button，获取后先将原先显示的房间ui销毁掉
+        GameObject[] pr = GameObject.FindGameObjectsWithTag("Room");
+        foreach (var r in pr)
+        {
+            Destroy(r);
+        }
+
+        //遍历房间信息改变了的房间，注意这个roomList不包括所有房间，而是有属性改变了的房间，比如新增的
+        foreach (var r in roomList)
+        {
+            //清除关闭或不可显示或已经移除了的房间
+            if (!r.IsOpen || !r.IsVisible || r.RemovedFromList)
+            {
+                if (myRoomList.ContainsKey(r.Name))//如果该房间之前有，现在没有了就去掉它
+                {
+                    myRoomList.Remove(r.Name);
+                }
+                continue;
+            }
+            //更新房间信息
+            if (myRoomList.ContainsKey(r.Name))
+            {
+                myRoomList[r.Name] = r;
+            }
+            //添加新房间
+            else
+            {
+                myRoomList.Add(r.Name, r);//如果该房间之前没有，现在有了就加进myRoomList
+            }
+        }
+
+        foreach (var r in myRoomList.Values)
+        {
+            //这个函数用来在canvas上添加房间ui的，自己定义
+            UpdateRoomList(r.Name);
+        }
+
+        Debug.Log("===roomList count:" + roomList.Count + "===myRoomList count:" + myRoomList.Count);
+        messageText.text = "===roomList count:" + roomList.Count + "===myRoomList count:" + myRoomList.Count;
+    }
+    /// <summary>
+    /// 更新房間清單
+    /// </summary>
+    /// <param name="name"></param>
+    public void UpdateRoomList(string name)
+    {
+        //这里我已经把房间ui做成prefab保存在Resources文件夹了
+        GameObject go = Instantiate(Resources.Load("Prefabs/JoinThisRoomBtn") as GameObject);
+        go.transform.parent = roomInLobbyPanel.transform;//roomInLobbyPanel是我用来放显示房间列表的panel
+        go.transform.localScale = Vector3.one;
+        go.name = name;
+        go.transform.Find("ff").GetComponentInChildren<Text>().text = name;//设置好文字为房间名
+                                                                       //绑定选择房间事件（自定义）
+        go.GetComponent<Button>().onClick.AddListener(delegate ()
+        {
+           ChooseRoom(go.name);
+        });
+    }
+   public void ChooseRoom(string go)
+    {
+        PhotonNetwork.JoinRoom(go);
+        PhotonNetwork.LoadLevel("Room for 1");
+    }
+  
+}
