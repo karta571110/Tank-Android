@@ -27,7 +27,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
 
 
     #endregion
-    int i, j, k, l;//用於迭代
+
 
     Dictionary<string, RoomInfo> myRoomList = new Dictionary<string, RoomInfo>();//房間清單
 
@@ -36,6 +36,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
     Button ConnectBtn;
     Button CreatRoomBtn;
     Button CreatRoomSettingFinishBtn;
+    Button JoinRandomRoomBtn;
 
 
     InputField NameInputField;//玩家名稱
@@ -43,44 +44,60 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
     InputField maxPlayerNumInputField;//房間最大人數
 
     Text Connecttxt;
-    Text messageText;
 
     GameObject ConnectPanel;
     GameObject CreatRoomPanel;
-    GameObject roomInLobbyPanel;
-    GameObject RoomNameBtn;
+    GameObject RoomListPanel;
+    GameObject RoomNameObj;
+    GameObject ViewPort;
 
     public Transform gridLayout;
     bool isConectting = false;
 
     private void Awake()
     {
-        
+
         PhotonNetwork.AutomaticallySyncScene = true;
-        for (i = 0; i < transform.childCount; i++)
+
+        for (int i = 0; i < transform.childCount; i++)
         {
             switch (transform.GetChild(i).name)
             {
                 case "Canvas":
-                    for (j = 0; j < transform.GetChild(i).transform.childCount; j++)
+                    for (int j = 0; j < transform.GetChild(i).transform.childCount; j++)
                     {
                         switch (transform.GetChild(i).transform.GetChild(j).name)
                         {
+                            case "JoinRandomRoomBtn":
+                                JoinRandomRoomBtn = transform.GetChild(i).transform.GetChild(j).GetComponent<Button>();
+                                JoinRandomRoomBtn.onClick.AddListener(OnJoinedRoom);
+                                break;
                             case "RoomListPanel":
-                                roomInLobbyPanel = transform.GetChild(i).transform.GetChild(j).gameObject;
-                                for (k = 0; k < roomInLobbyPanel.transform.childCount; k++)
+                                RoomListPanel = transform.GetChild(i).transform.GetChild(j).gameObject;
+                                for (int k = 0; k < RoomListPanel.transform.childCount; k++)
                                 {
-                                    switch (roomInLobbyPanel.transform.GetChild(k).name)
+                                    switch (RoomListPanel.transform.GetChild(k).name)
                                     {
-                                        case "MessageText":
-                                            messageText = roomInLobbyPanel.transform.GetChild(k).GetComponent<Text>();
+                                        case "Viewport":
+                                            ViewPort = RoomListPanel.transform.GetChild(k).gameObject;
+                                            for (int l = 0; l < ViewPort.transform.childCount; l++)
+                                            {
+                                                switch (ViewPort.transform.GetChild(l).name)
+                                                {
+                                                    case "Content":
+                                                        Debug.Log("sds");
+
+                                                        gridLayout = RoomListPanel.transform.GetChild(k).transform.GetChild(l).transform;
+                                                        break;
+                                                }
+                                            }
                                             break;
                                     }
                                 }
                                 break;
                             case "Connecting":
                                 ConnectPanel = transform.GetChild(i).transform.GetChild(j).gameObject;
-                                for (l = 0; l < ConnectPanel.transform.childCount; l++)
+                                for (int l = 0; l < ConnectPanel.transform.childCount; l++)
                                 {
                                     switch (ConnectPanel.transform.GetChild(l).name)
                                     {
@@ -90,7 +107,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
                                             break;
                                         case "PlayerNameInputField":
                                             NameInputField = ConnectPanel.transform.GetChild(l).GetComponent<InputField>();
-                                            for (k = 0; k < NameInputField.transform.childCount; k++)
+                                            for (int k = 0; k < NameInputField.transform.childCount; k++)
                                             {
                                                 switch (NameInputField.transform.GetChild(k).name)
                                                 {
@@ -113,7 +130,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
                                 break;
                             case "CreatRoomPanel":
                                 CreatRoomPanel = transform.GetChild(i).transform.GetChild(j).gameObject;
-                                for (k = 0; k < CreatRoomPanel.transform.childCount; k++)
+                                for (int k = 0; k < CreatRoomPanel.transform.childCount; k++)
                                 {
                                     switch (CreatRoomPanel.transform.GetChild(k).name)
                                     {
@@ -121,7 +138,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
                                             CreateRoomNameInputField = CreatRoomPanel.transform.GetChild(k).GetComponent<InputField>();
                                             break;
                                         case "PlayerNumInputField":
-                                            maxPlayerNumInputField= CreatRoomPanel.transform.GetChild(k).GetComponent<InputField>();
+                                            maxPlayerNumInputField = CreatRoomPanel.transform.GetChild(k).GetComponent<InputField>();
                                             break;
                                         case "SettingFinishBtn":
                                             CreatRoomSettingFinishBtn = CreatRoomPanel.transform.GetChild(k).GetComponent<Button>();
@@ -136,13 +153,16 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
                     break;
             }
         }//找物件
+        RoomNameObj = Resources.Load<GameObject>("Prefabs/RoomNameBtn");
+        Connecttxt.enabled = true;
     }
     // Start is called before the first frame update
     void Start()
     {
-  
+
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.GameVersion = gameVersion;
+
 
         string defaultName = string.Empty;
         if (NameInputField != null)
@@ -168,8 +188,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
         }
         else
             isConectting = false;
-            
-        
+
+
     }
 
     public void SetPlayerName(string value)
@@ -194,16 +214,17 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
     /// <param name="txt"></param>
     public void Connect(GameObject Panel, Text txt)
     {
-        
+
         // we check if we are connected or not, we join if we are , else we initiate the connection to the server.
         if (PhotonNetwork.IsConnected)
         {
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
             // PhotonNetwork.JoinRandomRoom();
             Debug.Log("你已經連接成功，暱稱已設定完成!");
-
-            roomInLobbyPanel.SetActive(true);
-            Panel.SetActive(false);
+            ConnectPanel.SetActive(false);
+            RoomListPanel.SetActive(true);
+            CreatRoomBtn.gameObject.SetActive(true);
+            JoinRandomRoomBtn.gameObject.SetActive(true);
             CreatRoomBtn.gameObject.SetActive(true);
 
         }
@@ -247,7 +268,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
                 default:
                     Debug.Log("無效的數字");
                     return;
-                    
+
             }
             Debug.Log("房間創建成功");
             PhotonNetwork.CreateRoom(CreateRoomNameInputField.text, new RoomOptions() { MaxPlayers = maxPlayers });
@@ -259,7 +280,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
         if (isConectting)
         {
             PhotonNetwork.JoinLobby();//加入大廳
-            
+
             Debug.Log("已加入大廳\nPUN Basics Tutorial/Launcher: OnConnectedToMaster() was called by PUN");
         }
     }
@@ -273,11 +294,13 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
 
         // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
         // PhotonNetwork.CreateRoom(null, new RoomOptions());
-        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayersPerRoom });
+        PhotonNetwork.CreateRoom("我的房間", new RoomOptions { MaxPlayers = maxPlayersPerRoom });
     }
 
     public override void OnJoinedRoom()
     {
+
+        PhotonNetwork.JoinRandomRoom();
         /*
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
@@ -296,7 +319,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
         Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
     }
     #endregion
-    
+
     /// <summary>
     /// 查看房間清單
     /// </summary>
@@ -305,6 +328,13 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
     {
         Debug.Log("roomListUpdated");
 
+        foreach (var room in roomList)
+        {
+            GameObject newRoom = Instantiate(RoomNameObj, gridLayout.position, Quaternion.identity);
+            newRoom.GetComponentInChildren<Text>().text = room.Name;
+            newRoom.transform.SetParent(gridLayout);
+        }
+        /*
         //pr用来暂时保存ui上的房间button，获取后先将原先显示的房间ui销毁掉
         GameObject[] pr = GameObject.FindGameObjectsWithTag("Room");
         foreach (var r in pr)
@@ -343,7 +373,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
         }
 
         Debug.Log("===roomList count:" + roomList.Count + "===myRoomList count:" + myRoomList.Count);
-        messageText.text = "===roomList count:" + roomList.Count + "===myRoomList count:" + myRoomList.Count;
+        // messageText.text = "===roomList count:" + roomList.Count + "===myRoomList count:" + myRoomList.Count;
+        */
     }
     /// <summary>
     /// 更新房間清單
@@ -352,6 +383,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
     public void UpdateRoomList(string name)
     {
         //这里我已经把房间ui做成prefab保存在Resources文件夹了
+        /*
         GameObject go = Instantiate(Resources.Load("Prefabs/JoinThisRoomBtn") as GameObject);
         go.transform.parent = roomInLobbyPanel.transform;//roomInLobbyPanel是我用来放显示房间列表的panel
         go.transform.localScale = Vector3.one;
@@ -362,11 +394,12 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
         {
            ChooseRoom(go.name);
         });
+        */
     }
-   public void ChooseRoom(string go)
+    public void ChooseRoom(string go)
     {
         PhotonNetwork.JoinRoom(go);
         PhotonNetwork.LoadLevel("Room for 1");
     }
-  
+
 }
