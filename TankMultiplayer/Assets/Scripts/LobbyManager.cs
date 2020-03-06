@@ -226,6 +226,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
             CreatRoomBtn.gameObject.SetActive(true);
             JoinRandomRoomBtn.gameObject.SetActive(true);
             CreatRoomBtn.gameObject.SetActive(true);
+            PhotonNetwork.JoinLobby();
 
         }
         else
@@ -287,19 +288,28 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
 
 
 
-
+    /// <summary>
+    /// 加入隨機房間失敗
+    /// </summary>
+    /// <param name="returnCode"></param>
+    /// <param name="message"></param>
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Debug.Log("PUN Basics Tutorial/Launcher:OnJoinRandomFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom");
+
 
         // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
         // PhotonNetwork.CreateRoom(null, new RoomOptions());
-        PhotonNetwork.CreateRoom("我的房間", new RoomOptions { MaxPlayers = maxPlayersPerRoom });
+       // PhotonNetwork.ConnectUsingSettings();
+        //PhotonNetwork.JoinLobby();
+        Debug.Log("PUN Basics Tutorial/Launcher:OnJoinRandomFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom");
+            PhotonNetwork.CreateRoom("我的房間", new RoomOptions { MaxPlayers = maxPlayersPerRoom });
+        
+
     }
 
     public override void OnJoinedRoom()
     {
-
+      
         PhotonNetwork.JoinRandomRoom();
         /*
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
