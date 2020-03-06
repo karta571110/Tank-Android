@@ -70,7 +70,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
                         {
                             case "JoinRandomRoomBtn":
                                 JoinRandomRoomBtn = transform.GetChild(i).transform.GetChild(j).GetComponent<Button>();
-                                JoinRandomRoomBtn.onClick.AddListener(OnJoinedRoom);
+                                JoinRandomRoomBtn.onClick.AddListener(JoinRandomRoom);
                                 break;
                             case "RoomListPanel":
                                 RoomListPanel = transform.GetChild(i).transform.GetChild(j).gameObject;
@@ -220,13 +220,16 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
         {
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
             // PhotonNetwork.JoinRandomRoom();
-            Debug.Log("你已經連接成功，暱稱已設定完成!");
-            ConnectPanel.SetActive(false);
-            RoomListPanel.SetActive(true);
-            CreatRoomBtn.gameObject.SetActive(true);
-            JoinRandomRoomBtn.gameObject.SetActive(true);
-            CreatRoomBtn.gameObject.SetActive(true);
-            PhotonNetwork.JoinLobby();
+         
+            if (PhotonNetwork.InLobby)
+            {
+                Debug.Log("你已經連接成功，暱稱已設定完成!");
+                ConnectPanel.SetActive(false);
+                RoomListPanel.SetActive(true);
+                CreatRoomBtn.gameObject.SetActive(true);
+                JoinRandomRoomBtn.gameObject.SetActive(true);
+                CreatRoomBtn.gameObject.SetActive(true);
+            }
 
         }
         else
@@ -306,11 +309,15 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
         
 
     }
-
+    public void JoinRandomRoom()
+    {
+        PhotonNetwork.JoinRandomRoom();
+        Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
+    }
     public override void OnJoinedRoom()
     {
       
-        PhotonNetwork.JoinRandomRoom();
+       
         /*
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
@@ -338,9 +345,23 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
     {
         Debug.Log("roomListUpdated");
 
+        for(int i=0;i< gridLayout.childCount; i++)
+        {
+            if (gridLayout.GetChild(i).GetComponentInChildren<Text>().text.Equals(roomList[i].Name))
+            {
+                Destroy(gridLayout.GetChild(i).gameObject);
+
+                if (roomList[i].PlayerCount == 0) //判斷如果此房間裡沒人就從清單中刪除
+                {
+                    roomList.Remove(roomList[i]);
+                }
+            }
+        }
+
         foreach (var room in roomList)
         {
             GameObject newRoom = Instantiate(RoomNameObj, gridLayout.position, Quaternion.identity);
+            newRoom.GetComponent<Button>().onClick.AddListener(delegate { ChooseRoom(room.Name); });
             newRoom.GetComponentInChildren<Text>().text = room.Name;
             newRoom.transform.SetParent(gridLayout);
         }
