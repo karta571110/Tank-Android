@@ -261,15 +261,15 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 11864}
     - Class: 114
-      Script: {instanceID: 15584}
+      Script: {instanceID: 15568}
     - Class: 114
-      Script: {instanceID: 15586}
+      Script: {instanceID: 15570}
     - Class: 114
-      Script: {instanceID: 15588}
+      Script: {instanceID: 15572}
     - Class: 114
-      Script: {instanceID: 15590}
+      Script: {instanceID: 15574}
     - Class: 114
-      Script: {instanceID: 15592}
+      Script: {instanceID: 15576}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -1981,4 +1981,4 @@ ScriptsOnlyBuild:
   - Assets/Scenes/Room for 2.unity
   - Assets/Scenes/Room for 3.unity
   - Assets/Scenes/Room for 4.unity
-  playerPath: D:/UnityOutPut/photonTest/TankMultiplayer.exe
+  playerPath: E:/UnityOutputGame/Test/TankMultiplayer.exe

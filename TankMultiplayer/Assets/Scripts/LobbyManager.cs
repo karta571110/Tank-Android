@@ -164,6 +164,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
         PhotonNetwork.GameVersion = gameVersion;
 
 
+       
         string defaultName = string.Empty;
         if (NameInputField != null)
         {
@@ -220,7 +221,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
         {
             // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
             // PhotonNetwork.JoinRandomRoom();
-         
+
             if (PhotonNetwork.InLobby)
             {
                 Debug.Log("你已經連接成功，暱稱已設定完成!");
@@ -302,22 +303,23 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
 
         // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
         // PhotonNetwork.CreateRoom(null, new RoomOptions());
-       // PhotonNetwork.ConnectUsingSettings();
+        // PhotonNetwork.ConnectUsingSettings();
         //PhotonNetwork.JoinLobby();
         Debug.Log("PUN Basics Tutorial/Launcher:OnJoinRandomFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom");
-            PhotonNetwork.CreateRoom("我的房間", new RoomOptions { MaxPlayers = maxPlayersPerRoom });
-        
+        PhotonNetwork.CreateRoom("我的房間", new RoomOptions { MaxPlayers = maxPlayersPerRoom });
+        PhotonNetwork.LoadLevel("Room for 1");
 
     }
     public void JoinRandomRoom()
     {
         PhotonNetwork.JoinRandomRoom();
+        PhotonNetwork.LoadLevel("Room for 1");
         Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
     }
     public override void OnJoinedRoom()
     {
-      
-       
+
+
         /*
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
@@ -345,7 +347,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
     {
         Debug.Log("roomListUpdated");
 
-        for(int i=0;i< gridLayout.childCount; i++)
+        for (int i = 0; i < gridLayout.childCount; i++)
         {
             if (gridLayout.GetChild(i).GetComponentInChildren<Text>().text.Equals(roomList[i].Name))
             {

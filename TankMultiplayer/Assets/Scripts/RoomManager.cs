@@ -52,7 +52,7 @@ namespace Com.MyCompany.MyGame
             if (PhotonNetwork.IsMasterClient)
             {
                 Debug.LogFormat("OnPlayerEnteredRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient); // called before OnPlayerLeftRoom
-
+                Debug.Log("有人加入房間");
 
                 LoadArena();
             }
@@ -68,7 +68,7 @@ namespace Com.MyCompany.MyGame
             {
                 Debug.LogFormat("OnPlayerLeftRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient); // called before OnPlayerLeftRoom
 
-
+                Debug.Log("有人退出房間");
                 LoadArena();
             }
         }
