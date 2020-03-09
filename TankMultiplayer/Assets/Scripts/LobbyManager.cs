@@ -313,7 +313,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
     public void JoinRandomRoom()
     {
         PhotonNetwork.JoinRandomRoom();
-        PhotonNetwork.LoadLevel("Room for 1");
+        //PhotonNetwork.LoadLevel("Room for 1");
         Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
     }
     public override void OnJoinedRoom()

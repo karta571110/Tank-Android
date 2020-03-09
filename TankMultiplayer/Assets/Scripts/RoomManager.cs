@@ -95,9 +95,18 @@ namespace Com.MyCompany.MyGame
         /// </summary>
         public void LeaveRoom()
         {
-            PhotonNetwork.LeaveRoom();
+            StartCoroutine(startLeaveRoom());
         }
 
+        IEnumerator startLeaveRoom()
+        {
+            PhotonNetwork.LeaveRoom();
+
+            while (PhotonNetwork.InRoom)
+                yield return null;
+
+            SceneManager.LoadScene("Launcher");
+        }
 
         #endregion
 
