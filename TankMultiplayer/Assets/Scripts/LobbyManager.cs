@@ -159,10 +159,14 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
     // Start is called before the first frame update
     void Start()
     {
+        if(PhotonNetwork.IsConnected)
+        PhotonNetwork.Disconnect();
 
-        PhotonNetwork.ConnectUsingSettings();
-        PhotonNetwork.GameVersion = gameVersion;
-
+        if (!PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.ConnectUsingSettings();
+            PhotonNetwork.GameVersion = gameVersion;
+        }
 
        
         string defaultName = string.Empty;
@@ -185,6 +189,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
         if (PhotonNetwork.IsConnected)
         {
             isConectting = true;
+            if(PhotonNetwork.InLobby)
             Connecttxt.enabled = false;
         }
         else
@@ -349,7 +354,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
 
         for (int i = 0; i < gridLayout.childCount; i++)
         {
-            if (gridLayout.GetChild(i).GetComponentInChildren<Text>().text.Equals(roomList[i].Name))
+            if (gridLayout.GetChild(i).GetComponentInChildren<Text>().text==(roomList[i].Name))
             {
                 Destroy(gridLayout.GetChild(i).gameObject);
 
@@ -358,6 +363,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IConnectionCallbacks
                     roomList.Remove(roomList[i]);
                 }
             }
+        
         }
 
         foreach (var room in roomList)

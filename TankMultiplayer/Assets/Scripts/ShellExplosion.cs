@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
-public class ShellExplosion : MonoBehaviour
+using Photon.Pun;
+public class ShellExplosion : MonoBehaviourPunCallbacks
 {
     public LayerMask m_TankMask;
     public ParticleSystem m_ExplosionParticles;
@@ -49,6 +50,13 @@ public class ShellExplosion : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        
+        if (!photonView.IsMine)
+        {
+            return;
+        }
+        
+
         // Find all the tanks in an area around the shell and damage them.
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, m_ExplosionRadius, m_TankMask);

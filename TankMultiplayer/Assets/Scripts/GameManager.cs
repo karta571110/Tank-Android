@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Assertions;
-
-public class GameManager : MonoBehaviour
+using Photon.Pun;
+public class GameManager : MonoBehaviourPunCallbacks
 {
+    public static GameManager Instance;
     public int m_NumRoundsToWin = 5;
     public float m_StartDelay = 3f;
     public float m_EndDelay = 3f;
@@ -26,7 +27,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-
+        Instance = this;
         m_Tanks = new TankManager[playerNum];
       
  
@@ -242,5 +243,9 @@ public class GameManager : MonoBehaviour
         {
             m_Tanks[i].DisableControl();
         }
+    }
+public void LeaveRoom()
+    {
+        PhotonNetwork.LeaveRoom();
     }
 }

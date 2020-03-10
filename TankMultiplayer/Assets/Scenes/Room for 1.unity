@@ -622,6 +622,111 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1035211399}
   m_CullTransparentMesh: 0
+--- !u!1001 &1161285229
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 943203661, guid: 542fe27fd29bc6d4694e3d5a70452d5e, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1730354072, guid: 542fe27fd29bc6d4694e3d5a70452d5e, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1730354072, guid: 542fe27fd29bc6d4694e3d5a70452d5e, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 635082791858150148, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 635082791858150148, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 635082791858150148, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 635082791858150148, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 635082791858150148, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 635082791858150148, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 635082791858150148, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 635082791858150148, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 635082791858150148, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 635082791858150148, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 635082791858150148, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 635082791858243300, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+        type: 3}
+      propertyPath: m_Name
+      value: Tank Photon
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 1274340729, guid: 542fe27fd29bc6d4694e3d5a70452d5e, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: 542fe27fd29bc6d4694e3d5a70452d5e, type: 3}
+--- !u!1 &1161285230 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 635082791858243300, guid: 542fe27fd29bc6d4694e3d5a70452d5e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1161285229}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1161285231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1161285230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7310b2f43dea6ef45902eb2529b9dbb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distance: 7
+  height: 3
+  heightSmoothLag: 0.3
+  centerOffset: {x: 0, y: 0, z: 0}
+  followOnStart: 1
 --- !u!1 &1279410004
 GameObject:
   m_ObjectHideFlags: 0

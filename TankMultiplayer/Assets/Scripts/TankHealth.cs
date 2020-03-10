@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-
-public class TankHealth : MonoBehaviour
+using Photon.Pun;
+using Photon.Realtime;
+public class TankHealth : MonoBehaviourPunCallbacks
 {
     public float m_StartingHealth = 100f;          
     public Slider m_Slider;                        
@@ -74,8 +75,14 @@ public class TankHealth : MonoBehaviour
 
         SetHealthUI();
     }
-    
 
+    private void Update()
+    {
+        if (m_CurrentHealth <= 0f)
+        {
+            GameManager.Instance.LeaveRoom();
+        }
+    }
     public void TakeDamage(float amount)
     {
         // Adjust the tank's current health, update the UI based on the new health and check whether or not the tank is dead.

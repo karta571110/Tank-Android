@@ -54,7 +54,7 @@ namespace Com.MyCompany.MyGame
                 Debug.LogFormat("OnPlayerEnteredRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient); // called before OnPlayerLeftRoom
                 Debug.Log("有人加入房間");
 
-                LoadArena();
+                //LoadArena();
             }
         }
 
@@ -69,7 +69,7 @@ namespace Com.MyCompany.MyGame
                 Debug.LogFormat("OnPlayerLeftRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient); // called before OnPlayerLeftRoom
 
                 Debug.Log("有人退出房間");
-                LoadArena();
+                //LoadArena();
             }
         }
 
@@ -100,11 +100,11 @@ namespace Com.MyCompany.MyGame
 
         IEnumerator startLeaveRoom()
         {
+         
             PhotonNetwork.LeaveRoom();
-
             while (PhotonNetwork.InRoom)
                 yield return null;
-
+           
             SceneManager.LoadScene("Launcher");
         }
 

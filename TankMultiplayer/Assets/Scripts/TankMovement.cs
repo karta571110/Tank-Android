@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-
-public class TankMovement : MonoBehaviour
+using Photon.Pun;
+public class TankMovement : MonoBehaviourPunCallbacks
 {
     public int m_PlayerNumber = 1;
     public float m_Speed = 12f;
